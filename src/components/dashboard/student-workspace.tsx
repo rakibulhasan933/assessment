@@ -60,7 +60,6 @@ export function StudentWorkspace({
     ),
   );
   const [savingId, setSavingId] = useState<string | null>(null);
-  const [assistantId, setAssistantId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -80,71 +79,6 @@ export function StudentWorkspace({
         note: key === "note" ? value : current[assignmentId]?.note ?? "",
       },
     }));
-  }
-
-  async function handleAiAssist(assignment: AssignmentRecord) {
-    const current = formState[assignment.id];
-
-    if (!current || current.note.trim().length < 10) {
-      setError("Write a bit more detail in your note before asking for AI help.");
-      setMessage(null);
-      return;
-    }
-
-    setAssistantId(assignment.id);
-    setError(null);
-    setMessage(null);
-
-    try {
-      const response = await fetch("/api/ai/feedback", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          assignmentTitle: assignment.title,
-          assignmentDescription: assignment.description,
-          submissionUrl: current.url,
-          submissionNote: current.note,
-        }),
-      });
-      const data = (await response.json()) as {
-        error?: string;
-        feedback?: string;
-        strengths?: string[];
-        improvements?: string[];
-      };
-
-      if (!response.ok) {
-        setError(data.error ?? "Unable to get AI suggestions.");
-        return;
-      }
-
-      const suggestedNote = [
-        current.note.trim(),
-        data.strengths?.length
-          ? `Strengths already shown: ${data.strengths.join(" ")}`
-          : null,
-        data.improvements?.length
-          ? `Add this context before submitting: ${data.improvements.join(" ")}`
-          : null,
-      ]
-        .filter(Boolean)
-        .join("\n\n");
-
-      setFormState((currentState) => ({
-        ...currentState,
-        [assignment.id]: {
-          ...currentState[assignment.id],
-          note: suggestedNote,
-        },
-      }));
-      setMessage("AI suggestions were added to your note draft. Edit them before sending.");
-    } catch {
-      setError("Unable to get AI suggestions right now.");
-    } finally {
-      setAssistantId(null);
-    }
   }
 
   function handleSubmit(assignment: AssignmentRecord) {
@@ -300,17 +234,6 @@ export function StudentWorkspace({
                       <div className="flex flex-wrap gap-3">
                         <Button
                           type="button"
-                          variant="outline"
-                          onClick={() => handleAiAssist(assignment)}
-                          disabled={assistantId === assignment.id}
-                          className="h-11 rounded-2xl border-white/10 bg-white/5 px-5 text-slate-100 hover:bg-white/10"
-                        >
-                          {assistantId === assignment.id
-                            ? "Improving..."
-                            : "Improve note with AI"}
-                        </Button>
-                        <Button
-                          type="button"
                           onClick={() => handleSubmit(assignment)}
                           disabled={savingId === assignment.id}
                           className="h-11 rounded-2xl bg-cyan-400 px-5 text-slate-950 hover:bg-cyan-300"
@@ -332,8 +255,8 @@ export function StudentWorkspace({
                         <p className="mt-3 text-sm leading-6 text-slate-200">
                           {submission
                             ? `Last updated ${new Date(
-                                submission.updatedAt,
-                              ).toLocaleString()}.`
+                              submission.updatedAt,
+                            ).toLocaleString()}.`
                             : "Use the note field to document your approach before you submit."}
                         </p>
                         {submission?.feedback ? (
