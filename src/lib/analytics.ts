@@ -102,11 +102,13 @@ export async function getInstructorAnalytics(
     statusCounts[submission.status] += 1;
   }
 
-  const statusDistribution: StatusSummary[] = [
+  const statusOrder: SubmissionStatus[] = [
     "accepted",
     "pending",
     "needs_improvement",
-  ].map((status) => ({
+  ];
+
+  const statusDistribution: StatusSummary[] = statusOrder.map((status) => ({
     status,
     label: statusLabels[status],
     count: statusCounts[status],
@@ -154,44 +156,48 @@ export async function getInstructorAnalytics(
     ),
   }));
 
-  const difficultyPerformance: DifficultySummary[] = [
+  const difficultyCategories: AssignmentDifficulty[] = [
     "beginner",
     "intermediate",
     "advanced",
-  ].map((difficulty) => {
-    const relevantAssignments = assignmentInsights.filter(
-      (assignment) => assignment.difficulty === difficulty,
-    );
+  ];
 
-    const totalAssignments = relevantAssignments.length;
-    const totalSubmissions = relevantAssignments.reduce(
-      (sum, assignment) => sum + assignment.totalSubmissions,
-      0,
-    );
-    const acceptedSubmissions = relevantAssignments.reduce(
-      (sum, assignment) => sum + assignment.acceptedSubmissions,
-      0,
-    );
-    const pendingSubmissions = relevantAssignments.reduce(
-      (sum, assignment) => sum + assignment.pendingSubmissions,
-      0,
-    );
-    const needsImprovementSubmissions = relevantAssignments.reduce(
-      (sum, assignment) => sum + assignment.needsImprovementSubmissions,
-      0,
-    );
+  const difficultyPerformance: DifficultySummary[] = difficultyCategories.map(
+    (difficulty) => {
+      const relevantAssignments = assignmentInsights.filter(
+        (assignment) => assignment.difficulty === difficulty,
+      );
 
-    return {
-      difficulty,
-      label: difficultyLabels[difficulty],
-      totalAssignments,
-      totalSubmissions,
-      acceptedSubmissions,
-      pendingSubmissions,
-      needsImprovementSubmissions,
-      acceptanceRate: toRate(acceptedSubmissions, totalSubmissions),
-    };
-  });
+      const totalAssignments = relevantAssignments.length;
+      const totalSubmissions = relevantAssignments.reduce(
+        (sum, assignment) => sum + assignment.totalSubmissions,
+        0,
+      );
+      const acceptedSubmissions = relevantAssignments.reduce(
+        (sum, assignment) => sum + assignment.acceptedSubmissions,
+        0,
+      );
+      const pendingSubmissions = relevantAssignments.reduce(
+        (sum, assignment) => sum + assignment.pendingSubmissions,
+        0,
+      );
+      const needsImprovementSubmissions = relevantAssignments.reduce(
+        (sum, assignment) => sum + assignment.needsImprovementSubmissions,
+        0,
+      );
+
+      return {
+        difficulty,
+        label: difficultyLabels[difficulty],
+        totalAssignments,
+        totalSubmissions,
+        acceptedSubmissions,
+        pendingSubmissions,
+        needsImprovementSubmissions,
+        acceptanceRate: toRate(acceptedSubmissions, totalSubmissions),
+      };
+    },
+  );
 
   const totalSubmissions = submissionRows.length;
   const acceptedSubmissions = statusCounts.accepted;
