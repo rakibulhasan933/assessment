@@ -48,56 +48,59 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
   const navItems = navByRole[user.role];
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#08111f_0%,#0d1730_100%)] text-slate-50">
+    <div className="min-h-screen bg-gradient-to-b from-[#08111f] to-[#0d1730] text-slate-50">
       <div className="mx-auto flex min-h-screen w-full max-w-[1600px] flex-col lg:flex-row">
-        <aside className="border-b border-white/10 bg-slate-950/70 px-5 py-6 backdrop-blur lg:w-[320px] lg:border-r lg:border-b-0 lg:px-6">
+
+        {/* ── Sidebar ── */}
+        <aside className="flex flex-col gap-4 border-b border-white/8 bg-white/[0.03] px-5 py-6 backdrop-blur-sm lg:w-[280px] lg:border-r lg:border-b-0 lg:px-6">
+
+          {/* Logo + mobile logout row */}
           <div className="flex items-start justify-between gap-4 lg:block">
-            <div>
-              <Link href="/" className="flex items-center gap-3">
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-cyan-400 text-sm font-black text-slate-950">
-                  PH
-                </span>
-                <div>
-                  <p className="text-sm font-semibold tracking-wide">
-                    Programming Hero
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    Teaching operations platform
-                  </p>
-                </div>
-              </Link>
-
-              <div className="mt-6 rounded-[1.75rem] border border-white/10 bg-white/5 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
-                  {user.role}
-                </p>
-                <p className="mt-3 text-lg font-semibold">{user.name}</p>
-                <p className="mt-1 break-all text-sm text-slate-400">{user.email}</p>
+            <Link href="/" className="flex items-center gap-3">
+              <span className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-cyan-400 text-[11px] font-bold tracking-wide text-slate-950">
+                PH
+              </span>
+              <div>
+                <p className="text-sm font-medium text-slate-100">Programming Hero</p>
+                <p className="text-[11px] text-slate-500">Teaching operations platform</p>
               </div>
-            </div>
-
+            </Link>
             <div className="lg:hidden">
               <LogoutButton />
             </div>
           </div>
 
-          <nav className="mt-6 space-y-3">
+          {/* User card */}
+          <div className="rounded-xl border border-white/8 bg-white/[0.04] p-4">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-400">
+              {user.role}
+            </p>
+            <p className="mt-2.5 text-[15px] font-medium text-slate-100">{user.name}</p>
+            <p className="mt-1 break-all text-[12px] text-slate-500">{user.email}</p>
+          </div>
+
+          {/* Nav */}
+          <nav className="flex flex-col gap-1.5">
+            <p className="px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-600">
+              Navigation
+            </p>
             {navItems.map((item) => {
               const isActive = pathname === item.href;
-
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "block rounded-[1.5rem] border px-4 py-4 transition",
+                    "block rounded-xl border px-4 py-3 transition-colors duration-100",
                     isActive
-                      ? "border-cyan-400/30 bg-cyan-400/10 text-cyan-50"
-                      : "border-white/10 bg-white/[0.03] text-slate-200 hover:bg-white/[0.07]",
+                      ? "border-cyan-400/25 bg-cyan-400/[0.07] text-cyan-50"
+                      : "border-white/8 bg-transparent text-slate-300 hover:bg-white/[0.05]",
                   )}
                 >
-                  <p className="text-sm font-semibold">{item.label}</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-400">
+                  <p className={cn("text-[13px] font-medium", isActive && "text-cyan-400")}>
+                    {item.label}
+                  </p>
+                  <p className="mt-0.5 text-[11px] leading-[1.5] text-slate-500">
                     {item.description}
                   </p>
                 </Link>
@@ -105,32 +108,28 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             })}
           </nav>
 
-          <div className="mt-6 hidden lg:block">
+          {/* Spacer + desktop logout */}
+          <div className="mt-auto hidden lg:block">
             <LogoutButton />
           </div>
         </aside>
 
-        <div className="flex-1">
-          <header className="border-b border-white/10 px-6 py-5">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
-                  Role-aware workspace
-                </p>
-                <h1 className="mt-2 text-2xl font-semibold tracking-tight">
-                  {user.role === "instructor"
-                    ? "Instructor operations"
-                    : "Student progress center"}
-                </h1>
-              </div>
-              <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">
-                Protected routes and role-based access are active
-              </div>
-            </div>
+        {/* ── Main ── */}
+        <div className="flex flex-1 flex-col">
+          <header className="border-b border-white/8 px-6 py-5">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-cyan-400">
+              Role-aware workspace
+            </p>
+            <h1 className="mt-1.5 text-xl font-medium tracking-tight text-slate-100">
+              {user.role === "instructor"
+                ? "Instructor operations"
+                : "Student progress center"}
+            </h1>
           </header>
 
-          <main className="px-6 py-8">{children}</main>
+          <main className="flex-1 px-6 py-8">{children}</main>
         </div>
+
       </div>
     </div>
   );
