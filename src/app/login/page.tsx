@@ -1,5 +1,5 @@
-import { AuthPanel } from "@/components/auth/auth-panel";
 import Link from "next/link";
+import { AuthPanel } from "@/components/auth/auth-panel";
 
 export default function LoginPage() {
   return (

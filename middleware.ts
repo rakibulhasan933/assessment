@@ -65,7 +65,7 @@ async function verifySessionToken(token: string) {
   return payload;
 }
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (
